@@ -65,7 +65,7 @@ class ConnectycubeFCMService : FirebaseMessagingService() {
         if (callType == null || callInitiatorId == null || callInitiatorName == null || callOpponents.isEmpty()) {
             return
         }
-        var path = data["path"]
+        var path = data["avatar_path"]
         if (path == null) {
             path = "R.drawable.profile"
         }
