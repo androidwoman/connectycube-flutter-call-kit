@@ -146,7 +146,10 @@ class ConnectycubeFlutterCallKitPlugin : FlutterPlugin, MethodCallHandler,
                         .split(',')
                         .map { it.toInt() })
                     val userInfo = arguments["user_info"] as String
-                    val path = arguments["user_image"] as String
+                    var path = arguments["avatar_path"]
+                    if (path == null) {
+                        path = "R.drawable.profile"
+                    }
 
                     showCallNotification(
                         applicationContext!!,
