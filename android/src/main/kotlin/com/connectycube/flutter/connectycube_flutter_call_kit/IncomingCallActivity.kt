@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -15,11 +16,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.Nullable
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import java.io.File
 
 
 fun createStartIncomingScreenIntent(
     context: Context, callId: String, callType: Int, callInitiatorId: Int,
-    callInitiatorName: String, opponents: ArrayList<Int>, userInfo: String
+    callInitiatorName: String, opponents: ArrayList<Int>, userInfo: String, path: String
 ): Intent {
     val intent = Intent(context, IncomingCallActivity::class.java)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
@@ -29,13 +31,14 @@ fun createStartIncomingScreenIntent(
     intent.putExtra(EXTRA_CALL_INITIATOR_NAME, callInitiatorName)
     intent.putIntegerArrayListExtra(EXTRA_CALL_OPPONENTS, opponents)
     intent.putExtra(EXTRA_CALL_USER_INFO, userInfo)
+    intent.putExtra(EXTRA_CALL_USER_IMAGE, path)
     return intent
 }
 
 class IncomingCallActivity : Activity() {
     private lateinit var callStateReceiver: BroadcastReceiver
     private lateinit var localBroadcastManager: LocalBroadcastManager
-
+    private var path: String? = null
     private var callId: String? = null
     private var callType = -1
     private var callInitiatorId = -1
@@ -117,9 +120,16 @@ class IncomingCallActivity : Activity() {
         callInitiatorName = intent.getStringExtra(EXTRA_CALL_INITIATOR_NAME)
         callOpponents = intent.getIntegerArrayListExtra(EXTRA_CALL_OPPONENTS)
         callUserInfo = intent.getStringExtra(EXTRA_CALL_USER_INFO)
+        path = intent.getStringExtra(EXTRA_CALL_USER_IMAGE)
     }
 
     private fun initUi() {
+        val callImage: ImageView =
+            findViewById(resources.getIdentifier("user_image", "id", packageName))
+        if (path.equals("R.drawable.profile"))
+            callImage.setImageDrawable(resources.getDrawable(R.drawable.profile));
+        else
+            callImage.setImageURI(Uri.fromFile(File(path)));
         val callTitleTxt: TextView =
             findViewById(resources.getIdentifier("user_name_txt", "id", packageName))
         callTitleTxt.text = callInitiatorName
@@ -130,13 +140,16 @@ class IncomingCallActivity : Activity() {
         val avatarImg: ImageView =
             findViewById(resources.getIdentifier("avatar_img", "id", packageName))
 
-        val defaultImgResId = resources.getIdentifier("connectycube_place_holder", "drawable", packageName)
-        val customAvatarResName = com.connectycube.flutter.connectycube_flutter_call_kit.utils.getString(this, "icon")
-        if (TextUtils.isEmpty(customAvatarResName)){
+        val defaultImgResId =
+            resources.getIdentifier("connectycube_place_holder", "drawable", packageName)
+        val customAvatarResName =
+            com.connectycube.flutter.connectycube_flutter_call_kit.utils.getString(this, "icon")
+        if (TextUtils.isEmpty(customAvatarResName)) {
             avatarImg.setImageResource(defaultImgResId)
         } else {
-            val imgResourceId = resources.getIdentifier(customAvatarResName, "drawable", packageName)
-            if (imgResourceId != 0){
+            val imgResourceId =
+                resources.getIdentifier(customAvatarResName, "drawable", packageName)
+            if (imgResourceId != 0) {
                 avatarImg.setImageResource(imgResourceId)
             } else {
                 avatarImg.setImageResource(defaultImgResId)

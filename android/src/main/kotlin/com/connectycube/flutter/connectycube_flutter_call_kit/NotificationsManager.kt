@@ -6,6 +6,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.AudioAttributes
 import android.net.Uri
@@ -18,6 +19,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.connectycube.flutter.connectycube_flutter_call_kit.utils.getColorizedText
 import com.connectycube.flutter.connectycube_flutter_call_kit.utils.getString
+import java.io.File
 
 const val CALL_CHANNEL_ID = "calls_channel_id"
 const val CALL_CHANNEL_NAME = "Calls"
@@ -30,7 +32,7 @@ fun cancelCallNotification(context: Context, callId: String) {
 
 fun showCallNotification(
     context: Context, callId: String, callType: Int, callInitiatorId: Int,
-    callInitiatorName: String, callOpponents: ArrayList<Int>, userInfo: String
+    callInitiatorName: String, callOpponents: ArrayList<Int>, userInfo: String, path: String
 ) {
     val notificationManager = NotificationManagerCompat.from(context)
 
@@ -40,7 +42,7 @@ fun showCallNotification(
         context,
         callId.hashCode(),
         intent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
 
     var ringtone: Uri
@@ -60,7 +62,14 @@ fun showCallNotification(
         String.format(CALL_TYPE_PLACEHOLDER, if (callType == 1) "Video" else "Audio")
 
     val builder: NotificationCompat.Builder =
-        createCallNotification(context, callInitiatorName, callTypeTitle, pendingIntent, ringtone)
+        createCallNotification(
+            context,
+            callInitiatorName,
+            callTypeTitle,
+            pendingIntent,
+            ringtone,
+            path
+        )
 
     // Add actions
     addCallRejectAction(
@@ -93,7 +102,8 @@ fun showCallNotification(
         callInitiatorId,
         callInitiatorName,
         callOpponents,
-        userInfo
+        userInfo,
+        path
     )
 
     // Add action when delete call notification
@@ -129,8 +139,12 @@ fun createCallNotification(
     title: String,
     text: String?,
     pendingIntent: PendingIntent,
-    ringtone: Uri
+    ringtone: Uri,
+    path: String
 ): NotificationCompat.Builder {
+    var p = BitmapFactory.decodeFile(File(path).absolutePath)
+    if (path == "R.drawable.profile")
+        p = BitmapFactory.decodeResource(context.resources, R.drawable.profile)
     val notificationBuilder = NotificationCompat.Builder(context, CALL_CHANNEL_ID)
     notificationBuilder
         .setDefaults(NotificationCompat.DEFAULT_VIBRATE)
@@ -139,6 +153,7 @@ fun createCallNotification(
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
         .setAutoCancel(true)
         .setOngoing(true)
+        .setLargeIcon(p)
         .setCategory(NotificationCompat.CATEGORY_CALL)
         .setContentIntent(pendingIntent)
         .setSound(ringtone)
@@ -171,7 +186,7 @@ fun addCallRejectAction(
         Intent(context, EventReceiver::class.java)
             .setAction(ACTION_CALL_REJECT)
             .putExtras(bundle),
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
     val declineAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
         context.resources.getIdentifier(
@@ -211,7 +226,7 @@ fun addCallAcceptAction(
         Intent(context, EventReceiver::class.java)
             .setAction(ACTION_CALL_ACCEPT)
             .putExtras(bundle),
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
     val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
         context.resources.getIdentifier("ic_menu_call", "drawable", context.packageName),
@@ -230,7 +245,8 @@ fun addCallFullScreenIntent(
     callInitiatorId: Int,
     callInitiatorName: String,
     callOpponents: ArrayList<Int>,
-    userInfo: String
+    userInfo: String,
+    path: String
 ) {
     val callFullScreenIntent: Intent = createStartIncomingScreenIntent(
         context,
@@ -239,14 +255,17 @@ fun addCallFullScreenIntent(
         callInitiatorId,
         callInitiatorName,
         callOpponents,
-        userInfo
+        userInfo,
+        path
     )
     val fullScreenPendingIntent = PendingIntent.getActivity(
         context,
         callId.hashCode(),
         callFullScreenIntent,
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
+
+
     notificationBuilder.setFullScreenIntent(fullScreenPendingIntent, true)
 }
 
@@ -272,8 +291,10 @@ fun addCancelCallNotificationIntent(
         Intent(appContext, EventReceiver::class.java)
             .setAction(ACTION_CALL_NOTIFICATION_CANCELED)
             .putExtras(bundle),
-        PendingIntent.FLAG_UPDATE_CURRENT
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
+
+
     notificationBuilder.setDeleteIntent(deleteCallNotificationPendingIntent)
 }
 

@@ -55,13 +55,12 @@ class ConnectycubeFlutterCallKit {
   ///
   /// - This function should only be called once at the beginning of
   /// your application.
-  void init({
-    CallEventHandler? onCallAccepted,
-    CallEventHandler? onCallRejected,
-    String? ringtone,
-    String? icon,
-    String? color
-  }) {
+  void init(
+      {CallEventHandler? onCallAccepted,
+      CallEventHandler? onCallRejected,
+      String? ringtone,
+      String? icon,
+      String? color}) {
     _onCallAccepted = onCallAccepted;
     _onCallRejected = onCallRejected;
 
@@ -152,6 +151,8 @@ class ConnectycubeFlutterCallKit {
 
   /// Show incoming call notification
   static Future<void> showCallNotification(CallEvent callEvent) async {
+    if (callEvent.avatarPath == null)
+      callEvent.copyWith(avatarPath: "R.drawable.profile");
     return _methodChannel.invokeMethod(
         "showCallNotification", callEvent.toMap());
   }
