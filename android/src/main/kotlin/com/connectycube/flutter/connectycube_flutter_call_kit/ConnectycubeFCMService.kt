@@ -65,6 +65,11 @@ class ConnectycubeFCMService : FirebaseMessagingService() {
         if (callType == null || callInitiatorId == null || callInitiatorName == null || callOpponents.isEmpty()) {
             return
         }
+        var path = data["path"]
+        if (path == null) {
+            path = "R.drawable.profile"
+        }
+
 
         showCallNotification(
             applicationContext,
@@ -73,7 +78,7 @@ class ConnectycubeFCMService : FirebaseMessagingService() {
             callInitiatorId,
             callInitiatorName,
             callOpponents,
-            userInfo
+            userInfo, path
         )
 
         saveCallState(applicationContext, callId, CALL_STATE_PENDING)
