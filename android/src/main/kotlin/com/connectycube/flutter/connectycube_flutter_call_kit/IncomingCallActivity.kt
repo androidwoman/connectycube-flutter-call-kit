@@ -21,7 +21,7 @@ import java.io.File
 
 fun createStartIncomingScreenIntent(
     context: Context, callId: String, callType: Int, callInitiatorId: Int,
-    callInitiatorName: String, opponents: ArrayList<Int>, userInfo: String, path: String
+    callInitiatorName: String, opponents: ArrayList<Int>, userInfo: String, path: String?
 ): Intent {
     val intent = Intent(context, IncomingCallActivity::class.java)
     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK

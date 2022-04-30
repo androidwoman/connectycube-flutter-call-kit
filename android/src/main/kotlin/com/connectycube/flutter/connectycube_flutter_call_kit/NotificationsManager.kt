@@ -32,7 +32,7 @@ fun cancelCallNotification(context: Context, callId: String) {
 
 fun showCallNotification(
     context: Context, callId: String, callType: Int, callInitiatorId: Int,
-    callInitiatorName: String, callOpponents: ArrayList<Int>, userInfo: String, path: String
+    callInitiatorName: String, callOpponents: ArrayList<Int>, userInfo: String, path: String?
 ) {
     val notificationManager = NotificationManagerCompat.from(context)
 
@@ -140,10 +140,10 @@ fun createCallNotification(
     text: String?,
     pendingIntent: PendingIntent,
     ringtone: Uri,
-    path: String
+    path: String?
 ): NotificationCompat.Builder {
     var p = BitmapFactory.decodeFile(File(path).absolutePath)
-    if (path == "R.drawable.profile")
+    if (path==null || path == "R.drawable.profile")
         p = BitmapFactory.decodeResource(context.resources, R.drawable.profile)
     val notificationBuilder = NotificationCompat.Builder(context, CALL_CHANNEL_ID)
     notificationBuilder
@@ -246,7 +246,7 @@ fun addCallFullScreenIntent(
     callInitiatorName: String,
     callOpponents: ArrayList<Int>,
     userInfo: String,
-    path: String
+    path: String?
 ) {
     val callFullScreenIntent: Intent = createStartIncomingScreenIntent(
         context,
