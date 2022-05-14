@@ -6,7 +6,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.media.AudioAttributes
@@ -46,7 +45,7 @@ fun showCallNotification(
         PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
     )
 
-    var ringtone: Uri
+    val ringtone: Uri
 
     val customRingtone = getString(context, "ringtone")
     Log.d("NotificationsManager", "customRingtone $customRingtone")
@@ -143,7 +142,7 @@ fun createCallNotification(
     ringtone: Uri,
     path: String
 ): NotificationCompat.Builder {
-    var p = if (path == "R.drawable.profile")
+    val p = if (path == "R.drawable.profile")
         BitmapFactory.decodeResource(context.resources, R.drawable.profile)
     else {
         BitmapFactory.decodeFile(File(path).absolutePath)
@@ -215,29 +214,31 @@ fun addCallAcceptAction(
     opponents: ArrayList<Int>,
     userInfo: String
 ) {
-    val bundle = Bundle()
-    bundle.putString(EXTRA_CALL_ID, callId)
-    bundle.putInt(EXTRA_CALL_TYPE, callType)
-    bundle.putInt(EXTRA_CALL_INITIATOR_ID, callInitiatorId)
-    bundle.putString(EXTRA_CALL_INITIATOR_NAME, callInitiatorName)
-    bundle.putIntegerArrayList(EXTRA_CALL_OPPONENTS, opponents)
-    bundle.putString(EXTRA_CALL_USER_INFO, userInfo)
+    if (Build.VERSION.SDK_INT < 31) {
+        val bundle = Bundle()
+        bundle.putString(EXTRA_CALL_ID, callId)
+        bundle.putInt(EXTRA_CALL_TYPE, callType)
+        bundle.putInt(EXTRA_CALL_INITIATOR_ID, callInitiatorId)
+        bundle.putString(EXTRA_CALL_INITIATOR_NAME, callInitiatorName)
+        bundle.putIntegerArrayList(EXTRA_CALL_OPPONENTS, opponents)
+        bundle.putString(EXTRA_CALL_USER_INFO, userInfo)
 
-    val acceptPendingIntent: PendingIntent = PendingIntent.getBroadcast(
-        context,
-        callId.hashCode(),
-        Intent(context, EventReceiver::class.java)
-            .setAction(ACTION_CALL_ACCEPT)
-            .putExtras(bundle),
-        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-    )
-    val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
-        context.resources.getIdentifier("ic_menu_call", "drawable", context.packageName),
-        getColorizedText("Accept", "#4CB050"),
-        acceptPendingIntent
-    )
-        .build()
-    notificationBuilder.addAction(acceptAction)
+        val acceptPendingIntent: PendingIntent = PendingIntent.getBroadcast(
+            context,
+            callId.hashCode(),
+            Intent(context, EventReceiver::class.java)
+                .setAction(ACTION_CALL_ACCEPT)
+                .putExtras(bundle),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val acceptAction: NotificationCompat.Action = NotificationCompat.Action.Builder(
+            context.resources.getIdentifier("ic_menu_call", "drawable", context.packageName),
+            getColorizedText("Accept", "#4CB050"),
+            acceptPendingIntent
+        )
+            .build()
+        notificationBuilder.addAction(acceptAction)
+    }
 }
 
 fun addCallFullScreenIntent(
@@ -303,11 +304,17 @@ fun addCancelCallNotificationIntent(
 
 fun createCallNotificationChannel(notificationManager: NotificationManagerCompat, sound: Uri) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        val channel = NotificationChannel(
+        var channel = NotificationChannel(
             CALL_CHANNEL_ID,
             CALL_CHANNEL_NAME,
             NotificationManager.IMPORTANCE_HIGH
         )
+        if (Build.VERSION.SDK_INT >= 31)
+            channel = NotificationChannel(
+                CALL_CHANNEL_ID,
+                CALL_CHANNEL_NAME,
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
         channel.setSound(
             sound, AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
