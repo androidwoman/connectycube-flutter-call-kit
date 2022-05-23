@@ -60,7 +60,6 @@
             android:id="@+id/start_call_btn"
             android:layout_width="80dp"
             android:layout_height="80dp"
-
             android:background="@drawable/selector_call_end"
             android:onClick="onStartCall"
             android:padding="16dp"
@@ -73,6 +72,8 @@
             android:layout_height="80dp"
             android:layout_marginStart="86dp"
             android:onClick="onEndCall"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
             android:padding="16dp"
             app:lottie_fileName="accept.json"
             tools:ignore="ContentDescription" />
