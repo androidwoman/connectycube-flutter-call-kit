@@ -21,7 +21,8 @@
             android:layout_height="fill_parent"
             android:layout_alignParentTop="true"
             android:layout_centerHorizontal="true"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:contentDescription="TODO" />
     </androidx.cardview.widget.CardView>
 
     <TextView
@@ -53,15 +54,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="50dp"
         android:gravity="center_horizontal">
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/end_call_btn"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:onClick="onStartCall"
-            android:padding="16dp"
+            android:paddingStart="50dp"
             app:lottie_loop="true"
             app:lottie_fileName="reject.json"
             app:lottie_autoPlay="true"
@@ -69,11 +70,11 @@
 
         <com.airbnb.lottie.LottieAnimationView
             android:id="@+id/start_call_btn"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
             android:layout_marginStart="86dp"
             android:onClick="onEndCall"
-            android:padding="16dp"
+            android:paddingEnd="50dp"
             app:lottie_autoPlay="true"
             app:lottie_fileName="accept.json"
             app:lottie_loop="true"
