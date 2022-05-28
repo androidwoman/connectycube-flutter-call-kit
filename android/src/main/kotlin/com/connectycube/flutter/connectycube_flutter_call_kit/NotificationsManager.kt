@@ -309,12 +309,6 @@ fun createCallNotificationChannel(notificationManager: NotificationManagerCompat
             CALL_CHANNEL_NAME,
             NotificationManager.IMPORTANCE_HIGH
         )
-        if (Build.VERSION.SDK_INT >= 31)
-            channel = NotificationChannel(
-                CALL_CHANNEL_ID,
-                CALL_CHANNEL_NAME,
-                NotificationManager.IMPORTANCE_DEFAULT
-            )
         channel.setSound(
             sound, AudioAttributes.Builder()
                 .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
